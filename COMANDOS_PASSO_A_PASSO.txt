@@ -1,0 +1,175 @@
+================================================================================
+                    DIMDIMAPP - COMANDOS PASSO A PASSO
+                    Para executar no Terminal do VSCode (Windows)
+================================================================================
+
+📋 PRÉ-REQUISITOS:
+- Java 21+ instalado
+- Maven 3.9+ instalado  
+- SQL Server Express instalado e configurado
+- Azure CLI instalado e logado
+
+================================================================================
+PARTE 1: VERIFICAR E CONFIGURAR AMBIENTE
+================================================================================
+
+1. Verificar se Java está instalado:
+   java -version
+
+2. Verificar se Maven está instalado:
+   mvn -version
+
+3. Verificar se SQL Server está rodando:
+   netstat -ano | findstr :1433
+
+4. Verificar se Azure CLI está logado:
+   az account show
+
+================================================================================
+PARTE 2: RODAR APLICAÇÃO LOCAL
+================================================================================
+
+5. Navegar para o diretório do projeto (se não estiver):
+   cd C:\Users\usuar\Downloads\cp-devops-cloud
+
+6. Verificar se a porta 8080 está livre:
+   netstat -ano | findstr :8080
+
+7. Se a porta estiver ocupada, parar o processo:
+   taskkill /F /PID [NUMERO_DO_PID]
+
+8. Executar a aplicação:
+   mvn spring-boot:run
+
+9. Aguardar a aplicação iniciar (aparecerá "Started DimDimAppApplication")
+
+10. Testar se está funcionando (em outro terminal):
+    curl http://localhost:8080/health
+
+11. Abrir Swagger UI no navegador:
+    start http://localhost:8080/swagger-ui.html
+
+================================================================================
+PARTE 3: FAZER BUILD DA APLICAÇÃO
+================================================================================
+
+12. Parar a aplicação (Ctrl + C no terminal onde está rodando)
+
+13. Fazer build da aplicação:
+    mvn clean package -DskipTests
+
+14. Verificar se o JAR foi criado:
+    dir target\*.jar
+
+================================================================================
+PARTE 4: CRIAR RECURSOS NO AZURE
+================================================================================
+
+15. Criar Resource Group:
+    az group create --name dimdim-rg-cli --location eastus2
+
+16. Criar SQL Server:
+    az sql server create --name dimdim-sql-cli --resource-group dimdim-rg-cli --location eastus2 --admin-user fiapuser --admin-password "Fiap@12345"
+
+17. Configurar Firewall do SQL Server:
+    az sql server firewall-rule create --resource-group dimdim-rg-cli --server dimdim-sql-cli --name "AllowAzureServices" --start-ip-address 0.0.0.0 --end-ip-address 0.0.0.0
+
+18. Criar Banco de Dados:
+    az sql db create --resource-group dimdim-rg-cli --server dimdim-sql-cli --name dimdim-db --service-objective S0
+
+19. Criar Application Insights:
+    az monitor app-insights component create --app dimdim-insights-cli --location eastus2 --resource-group dimdim-rg-cli
+
+20. Obter Connection String do Application Insights:
+    az monitor app-insights component show --app dimdim-insights-cli --resource-group dimdim-rg-cli --query connectionString -o tsv
+
+================================================================================
+PARTE 5: CRIAR APP SERVICE E FAZER DEPLOY
+================================================================================
+
+21. Criar App Service Plan:
+    az appservice plan create --name dimdim-plan-cli --resource-group dimdim-rg-cli --sku F1 --is-linux --location eastus2
+
+22. Criar Web App:
+    az webapp create --resource-group dimdim-rg-cli --plan dimdim-plan-cli --name dimdimapp-cli --runtime "JAVA:21-java21"
+
+23. Configurar variáveis de ambiente:
+    az webapp config appsettings set --resource-group dimdim-rg-cli --name dimdimapp-cli --settings "SPRING_PROFILES_ACTIVE=prod" "SPRING_DATASOURCE_URL=jdbc:sqlserver://dimdim-sql-cli.database.windows.net:1433;database=dimdim-db;encrypt=true;trustServerCertificate=false;loginTimeout=30;" "SPRING_DATASOURCE_USERNAME=fiapuser" "SPRING_DATASOURCE_PASSWORD=Fiap@12345" "SPRING_JPA_HIBERNATE_DDL_AUTO=update" "SPRING_JPA_SHOW_SQL=false" "LOGGING_LEVEL_COM_DIMDIMAPP=INFO"
+
+24. Fazer deploy da aplicação:
+    az webapp deploy --resource-group dimdim-rg-cli --name dimdimapp-cli --src-path target/dimdim-app-0.0.1-SNAPSHOT.jar --type jar
+
+================================================================================
+PARTE 6: TESTAR APLICAÇÃO NA NUVEM
+================================================================================
+
+25. Aguardar alguns minutos para o deploy finalizar
+
+26. Testar Health Check:
+    curl https://dimdimapp-cli.azurewebsites.net/health
+
+27. Abrir aplicação no navegador:
+    start https://dimdimapp-cli.azurewebsites.net
+
+28. Abrir Swagger UI:
+    start https://dimdimapp-cli.azurewebsites.net/swagger-ui.html
+
+================================================================================
+PARTE 7: TESTAR ENDPOINTS (OPCIONAL)
+================================================================================
+
+29. Testar listagem de clientes:
+    curl https://dimdimapp-cli.azurewebsites.net/api/clientes
+
+30. Criar um cliente (via PowerShell):
+    $body = @{
+        nome = "João Silva"
+        email = "joao@email.com"
+        telefone = "11999999999"
+    } | ConvertTo-Json
+    Invoke-WebRequest -Uri "https://dimdimapp-cli.azurewebsites.net/api/clientes" -Method POST -Body $body -ContentType "application/json" -UseBasicParsing
+
+================================================================================
+PARTE 8: LIMPEZA (OPCIONAL)
+================================================================================
+
+31. Para remover todos os recursos do Azure:
+    az group delete --name dimdim-rg-cli --yes --no-wait
+
+================================================================================
+RESUMO DAS URLs IMPORTANTES
+================================================================================
+
+LOCAL:
+- Aplicação: http://localhost:8080
+- Swagger: http://localhost:8080/swagger-ui.html
+- Health: http://localhost:8080/health
+
+NUVEM:
+- Aplicação: https://dimdimapp-cli.azurewebsites.net
+- Swagger: https://dimdimapp-cli.azurewebsites.net/swagger-ui.html
+- Health: https://dimdimapp-cli.azurewebsites.net/health
+
+================================================================================
+COMANDOS RÁPIDOS PARA USO DIÁRIO
+================================================================================
+
+# Rodar local:
+mvn spring-boot:run
+
+# Parar aplicação:
+Ctrl + C
+
+# Deploy completo (usar o script):
+.\deploy-cli.bat
+
+# Testar local:
+curl http://localhost:8080/health
+
+# Testar nuvem:
+curl https://dimdimapp-cli.azurewebsites.net/health
+
+================================================================================
+
+
+

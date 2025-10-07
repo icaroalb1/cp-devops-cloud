@@ -1,0 +1,184 @@
+{
+  "api_examples": {
+    "base_url": "http://localhost:8080",
+    "endpoints": {
+      "health": {
+        "GET /health": {
+          "description": "Health check da aplicação",
+          "response": {
+            "status": "UP",
+            "timestamp": "2025-10-06T15:04:47.930-03:00",
+            "database": "OK",
+            "uptime": 5000
+          }
+        }
+      },
+      "clientes": {
+        "GET /clientes": {
+          "description": "Listar todos os clientes",
+          "response": [
+            {
+              "id": 1,
+              "nome": "João Silva",
+              "email": "joao@email.com",
+              "telefone": "11999999999",
+              "transacoes": []
+            }
+          ]
+        },
+        "GET /clientes/{id}": {
+          "description": "Buscar cliente por ID",
+          "path_parameter": "id: 1",
+          "response": {
+            "id": 1,
+            "nome": "João Silva",
+            "email": "joao@email.com",
+            "telefone": "11999999999",
+            "transacoes": [
+              {
+                "id": 1,
+                "valor": 150.5,
+                "data": "2025-10-06",
+                "cliente": {
+                  "id": 1,
+                  "nome": "João Silva",
+                  "email": "joao@email.com",
+                  "telefone": "11999999999"
+                }
+              }
+            ]
+          }
+        },
+        "POST /clientes": {
+          "description": "Criar novo cliente",
+          "request_body": {
+            "nome": "João Silva",
+            "email": "joao@email.com",
+            "telefone": "11999999999"
+          },
+          "response": {
+            "id": 1,
+            "nome": "João Silva",
+            "email": "joao@email.com",
+            "telefone": "11999999999",
+            "transacoes": []
+          },
+          "status_code": 201
+        },
+        "PUT /clientes/{id}": {
+          "description": "Atualizar cliente",
+          "path_parameter": "id: 1",
+          "request_body": {
+            "nome": "João Silva Atualizado",
+            "email": "joao.novo@email.com",
+            "telefone": "11888888888"
+          },
+          "response": {
+            "id": 1,
+            "nome": "João Silva Atualizado",
+            "email": "joao.novo@email.com",
+            "telefone": "11888888888",
+            "transacoes": []
+          },
+          "status_code": 200
+        },
+        "DELETE /clientes/{id}": {
+          "description": "Deletar cliente",
+          "path_parameter": "id: 1",
+          "response": "Cliente deletado com sucesso",
+          "status_code": 200
+        }
+      },
+      "transacoes": {
+        "GET /transacoes": {
+          "description": "Listar todas as transações",
+          "response": [
+            {
+              "id": 1,
+              "valor": 150.5,
+              "data": "2025-10-06",
+              "cliente": {
+                "id": 1,
+                "nome": "João Silva",
+                "email": "joao@email.com",
+                "telefone": "11999999999"
+              }
+            }
+          ]
+        },
+        "GET /transacoes/{id}": {
+          "description": "Buscar transação por ID",
+          "path_parameter": "id: 1",
+          "response": {
+            "id": 1,
+            "valor": 150.5,
+            "data": "2025-10-06",
+            "cliente": {
+              "id": 1,
+              "nome": "João Silva",
+              "email": "joao@email.com",
+              "telefone": "11999999999"
+            }
+          }
+        },
+        "POST /transacoes": {
+          "description": "Criar nova transação",
+          "request_body": {
+            "valor": 150.5,
+            "data": "2025-10-06",
+            "clienteId": 1
+          },
+          "response": {
+            "id": 1,
+            "valor": 150.5,
+            "data": "2025-10-06",
+            "cliente": {
+              "id": 1,
+              "nome": "João Silva",
+              "email": "joao@email.com",
+              "telefone": "11999999999"
+            }
+          },
+          "status_code": 201
+        },
+        "PUT /transacoes/{id}": {
+          "description": "Atualizar transação",
+          "path_parameter": "id: 1",
+          "request_body": {
+            "valor": 200.0,
+            "data": "2025-10-07",
+            "clienteId": 1
+          },
+          "response": {
+            "id": 1,
+            "valor": 200.0,
+            "data": "2025-10-07",
+            "cliente": {
+              "id": 1,
+              "nome": "João Silva",
+              "email": "joao@email.com",
+              "telefone": "11999999999"
+            }
+          },
+          "status_code": 200
+        },
+        "DELETE /transacoes/{id}": {
+          "description": "Deletar transação",
+          "path_parameter": "id: 1",
+          "response": "Transação deletada com sucesso",
+          "status_code": 200
+        },
+        "GET /transacoes/cliente/{clienteId}/total": {
+          "description": "Calcular total das transações de um cliente",
+          "path_parameter": "clienteId: 1",
+          "response": {
+            "clienteId": 1,
+            "total": 150.5
+          }
+        }
+      }
+    },
+    "swagger_ui": "http://localhost:8080/swagger-ui/index.html",
+    "openapi_json": "http://localhost:8080/v3/api-docs"
+  }
+}
