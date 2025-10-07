@@ -1,6 +1,6 @@
 # DimDimApp 🏦
 
-Projeto Java completo para o 2º Checkpoint da disciplina "DevOps Tools & Cloud Computing" (Tema: DimDim).
+Projeto Java completo para o Checkpoint da disciplina "DevOps Tools & Cloud Computing" (Tema: DimDim).
 
 ## 📋 Sobre o Projeto
 
