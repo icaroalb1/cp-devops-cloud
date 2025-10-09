@@ -225,8 +225,8 @@ curl -X POST http://localhost:8080/transacoes \
 - [ ] Configurar alertas no Application Insights
 
 ## 👥 Equipe
+RM555166 - Guilherme Camargo - 2TDSPM RM555131 - Icaro Americo - 2TDSPM
 
-Projeto desenvolvido para o 2º Checkpoint da disciplina "DevOps Tools & Cloud Computing" - Tema DimDim.
 
 ## 📄 Licença
 
